@@ -5,6 +5,7 @@ import random
 MEANS = [0.22, 0.24, 0.23, 0.21]
 TRIALS = 10000
 SAMPLE_CSV = 'mab_sample.csv'
+RESULTS_FILE = 'thompson_results.txt'
 
 
 def main(variants=len(MEANS), trials=TRIALS, sample_csv=SAMPLE_CSV):
@@ -53,7 +54,7 @@ def main(variants=len(MEANS), trials=TRIALS, sample_csv=SAMPLE_CSV):
     return cum_successes, cum_fails, trial_results, trial_chosen_variant, regret_vector, cum_regret, best_test_variant
 
 
-def save_results(results_tuple):
+def save_results(results_tuple, results_file=RESULTS_FILE):
     results = {'cum_successes': results_tuple[0],
                'cum_fails': results_tuple[1],
                'trial_results': results_tuple[2],
@@ -62,7 +63,7 @@ def save_results(results_tuple):
                'cum_regret': results_tuple[5],
                'best_test_variant': results_tuple[6]
                }
-    with open('results.txt', 'w') as f:
+    with open(results_file, 'w') as f:
         json.dump(results, f)
 
 

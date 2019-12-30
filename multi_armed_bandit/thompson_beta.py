@@ -2,15 +2,15 @@ import json
 import pandas as pd
 import random
 
-MEANS = [0.22, 0.24, 0.23, 0.21]
+PROBS = [0.22, 0.24, 0.23, 0.21]
 TRIALS = 10000
 SAMPLE_CSV = 'mab_sample.csv'
 RESULTS_FILE = 'thompson_results.txt'
 
 
-def main(variants=len(MEANS), trials=TRIALS, sample_csv=SAMPLE_CSV):
+def main(variants=len(PROBS), trials=TRIALS, sample_csv=SAMPLE_CSV):
     """
-    Uses Thompson Sampling with Beta Bernoulli distributions to solve multi-armed bandit problem
+    Uses Thompson Sampling with Beta Bernoulli distributions to solve multi-armed bandit problem.
 
     Thompson Sampling selects the tested best variant depending on the Beta Bernoulli distributions of the variants.
     As each trial is performed, the Beta Bernoulli distributions will adjust based on the performance of the variants.
@@ -69,6 +69,12 @@ def main(variants=len(MEANS), trials=TRIALS, sample_csv=SAMPLE_CSV):
 
 
 def save_results(results_tuple, results_file=RESULTS_FILE):
+    """
+    Converts results to JSON for saving to txt file
+    :param results_tuple: tuple of the results as returned by main()
+    :param results_file: txt file that results will be written to
+    """
+
     results = {'cum_successes': results_tuple[0],
                'cum_fails': results_tuple[1],
                'trial_results': results_tuple[2],
@@ -81,9 +87,16 @@ def save_results(results_tuple, results_file=RESULTS_FILE):
         json.dump(results, f)
 
 
-def create_sample_data(means=MEANS, trials=TRIALS, output_csv=SAMPLE_CSV):
+def create_sample_data(probs=PROBS, trials=TRIALS, output_csv=SAMPLE_CSV):
+    """
+    Create sample CSV of the conversions for each trial for each variant based on the probabilities
+    :param probs: list of probabilities
+    :param trials: number of trials
+    :param output_csv: CSV where sample data will be saved
+    """
+
     sample_data = []
-    for mean in means:
+    for mean in probs:
         weighted_random = [0] * int(((1-mean) * 100)) + [1] * int(mean * 100)
         sample_data.append([random.choice(weighted_random) for i in range(trials)])
 

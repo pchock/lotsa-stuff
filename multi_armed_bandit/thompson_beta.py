@@ -10,12 +10,28 @@ RESULTS_FILE = 'thompson_results.txt'
 
 def main(variants=len(MEANS), trials=TRIALS, sample_csv=SAMPLE_CSV):
     """
-    Uses Thompson Sampling with a Beta Bernoulli distribution to solve multi-armed bandit problem
+    Uses Thompson Sampling with Beta Bernoulli distributions to solve multi-armed bandit problem
+
+    Thompson Sampling selects the tested best variant depending on the Beta Bernoulli distributions of the variants.
+    As each trial is performed, the Beta Bernoulli distributions will adjust based on the performance of the variants.
+    As these distributions change, Thompson Sampling is more likely to pick the better-performing variants, thus
+    minimizing regret as trials continue.
+
+    Regret represents how much worse the tested variant performs than the best variant. In other words, how much do you
+    regret testing the chosen variant instead of using the best variant. Cumulative regret is the sum total of regret
+    across all trials (up to the current trial). As the best variant is "unknown", regret is calculated by using the
+    tested Beta Bernoulli distributions of the variants.
+
+    Pulls from "Solving multiarmed bandits: A comparison of epsilon-greedy and Thompson sampling" by Conor McDonald
+    for ideas of implementing regret calculation.
+    https://towardsdatascience.com/solving-multiarmed-bandits-a-comparison-of-epsilon-greedy-and-thompson-sampling-d97167ca9a50
+
     :param variants: number of variants to be tested
     :param trials: number of tests that will be run
     :param sample_csv: CSV that contains the sample results of variant tests with shape trials x variants
-    :return: tuple of (success vector, failure vector, best variant)
+    :return: tuple of results
     """
+
     sample_data = pd.DataFrame.from_csv(sample_csv)
     beta_probs = [random.betavariate(1, 1) for i in range(variants)]
     cum_successes = [0] * variants
@@ -40,8 +56,6 @@ def main(variants=len(MEANS), trials=TRIALS, sample_csv=SAMPLE_CSV):
         beta_probs = [random.betavariate(cum_successes[i] + 1, cum_fails[i] + 1) for i in range(variants)]
 
         # calculate regret as the maximum beta_prob of all variants minus the beta_prob of the variant that was chosen
-        # see https://towardsdatascience.com/solving-multiarmed-bandits-a-comparison-of-epsilon-greedy-and-thompson-sampling-d97167ca9a50
-        # for example source
         regret = max(beta_probs) - beta_probs[variant]
         regret_vector.append(regret)
         cum_regret.append(cum_regret[-1] + regret)

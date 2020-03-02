@@ -31,8 +31,7 @@ def main(variants=len(PROBS), trials=TRIALS, sample_csv=SAMPLE_CSV):
     :param sample_csv: CSV that contains the sample results of variant tests with shape trials x variants
     :return: tuple of results
     """
-
-    sample_data = pd.DataFrame.from_csv(sample_csv)
+    sample_data = pd.read_csv(sample_csv)
     beta_probs = [random.betavariate(1, 1) for i in range(variants)]
     cum_successes = [0] * variants
     cum_fails = [0] * variants
@@ -102,7 +101,7 @@ def create_sample_data(probs=PROBS, trials=TRIALS, output_csv=SAMPLE_CSV):
 
     sample_df = pd.DataFrame(sample_data)
     sample_df = sample_df.transpose()
-    sample_df.to_csv(output_csv)
+    sample_df.to_csv(output_csv, index=False)
 
 
 if __name__ == "__main__":
